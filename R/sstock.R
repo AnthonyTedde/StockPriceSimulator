@@ -1,4 +1,5 @@
-sstock <- function(time_to_maturity = 4,
+sstock <- function(initial_stock_price = 50,
+                   time_to_maturity = 4,
                    seed = 1,
                    scale = 100,
                    sigma = 1){
@@ -9,7 +10,9 @@ sstock <- function(time_to_maturity = 4,
                            scale = scale)
 
   X <- sigma * rw[, 2] - 0.5 * sigma ^ 2 * rw[, 1]
-  structure(data.frame(rw[, 1], X),
+
+  S <- initial_stock_price * exp(X)
+  structure(data.frame(rw[, 1], S),
             names = c("time_periods", "stock_price_path")
   )
 }
