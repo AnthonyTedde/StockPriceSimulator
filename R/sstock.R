@@ -2,7 +2,7 @@
 #'
 #' \code{sstock} outputs price path for a fully random stock evolution
 #'
-#'
+#' @export
 sstock <- function(initial_stock_price = 50,
                    time_to_maturity = 4,
                    seed = 1,
