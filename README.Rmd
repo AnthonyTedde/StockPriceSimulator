@@ -23,7 +23,8 @@ theory provided by __"Stochastic Calculus For Finance ii", Shreve"__
 ### Key functions
 
  * Stock price generator for a single instance: [sstock()](sstock)
-
+ * Stock price generator for a single instance, using the Ito's formula approximation
+ [sstock\_ito()](sstock\_ito)
 
 ## Description of the functions as they was created and defined
 ### sstock()
@@ -57,4 +58,44 @@ stock_tick <- sstock()
 ggplot2::ggplot(stock_tick, 
                 ggplot2::aes(time_periods, stock_price_path)) +
   ggplot2::geom_point()
+```
+### sstock\ito()
+
+#### Summary
+
+It returns a data.frame containing the following variables:
+
+ * time_periods
+ * stock_price_path
+ 
+The computed path is based on approximation given by the Itô's formula.
+
+#### Arguments
+
+| Arguments | Default | Description |
+|---|---|---|
+| time_to_maturity | 4 | Final time up to the Stock Price Path goes |
+| seed | 1 | It fixes initial value of the pseudo random number generation in order to get reproducible experiments. |
+| scale | 100 | Define the partition of the time period. |
+| sigma | 1 | standard deviation of the stock |
+| alpha | 0 | Mean trend
+
+
+#### Example of Usage
+
+```{r}
+library(StockPriceSimulator)
+## Call the path generating function from equation:
+stock_tick <- sstock(scale = 1000)
+## Call the path generating function from Itô's approximation
+stock_tick_ito <- sstock_ito(scale = 1000)
+```
+
+```{r echo=FALSE}
+ggplot2::ggplot(stock_tick, 
+                ggplot2::aes(time_periods, stock_price_path)) +
+    ggplot2::geom_point(color = 'pink') +
+        ggplot2::geom_line(data = stock_tick_ito,
+                           aes(time_periods, stock_price_path),
+                           color = 'steelblue')
 ```
