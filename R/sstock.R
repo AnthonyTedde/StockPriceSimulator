@@ -18,7 +18,7 @@ sstock <- function(initial_stock_price = 50,
     W <- rw$brownian_motion_path
     t <- rw$time_periods
 
-    X <- sigma * W + ( alpha - 0.5 * sigma ^ 2 ) * t
+    X <- sigma * W
 
     S <- initial_stock_price * exp(X)
     structure(data.frame(rw[, 1], S),
@@ -65,7 +65,7 @@ sstock_ito <- function(initial_stock_price = 50,
     ## With the stock price model, the S(t), S'(t) and S''(t) are all the save because:
     ## S(t) = constant * e ^ x
     f <- function(i){
-        S0 * exp(sigma * RandomWalk::get_values(bw, i) + (alpha - 0.5 * sigma ^2) * i)
+        S0 * exp(sigma * RandomWalk::get_values(bw, i))
     }
     
     ## Prime Integration (Over a Brownian Motion)
@@ -86,6 +86,5 @@ sstock_ito <- function(initial_stock_price = 50,
 
     ## Equation
     S0 + prime + 0.5 * second
-    prime
     
 }
