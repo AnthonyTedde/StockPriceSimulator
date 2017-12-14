@@ -68,7 +68,7 @@ It returns a data.frame containing the following variables:
  * time_periods
  * stock_price_path
  
-The computed path is based on approximation given by the Itô's formula.
+The computed path is based on approximation given by the ItÃ´'s formula.
 
 #### Arguments
 
@@ -87,7 +87,7 @@ The computed path is based on approximation given by the Itô's formula.
 library(StockPriceSimulator)
 ## Call the path generating function from equation:
 stock_tick <- sstock(scale = 1000)
-## Call the path generating function from Itô's approximation
+## Call the path generating function from ItÃ´s approximation
 stock_tick_ito <- sstock_ito(scale = 1000)
 ```
 
@@ -96,6 +96,6 @@ ggplot2::ggplot(stock_tick,
                 ggplot2::aes(time_periods, stock_price_path)) +
     ggplot2::geom_point(color = 'pink') +
         ggplot2::geom_line(data = stock_tick_ito,
-                           aes(time_periods, stock_price_path),
+                           ggplot2::aes(time_periods, stock_price_path),
                            color = 'steelblue')
 ```
