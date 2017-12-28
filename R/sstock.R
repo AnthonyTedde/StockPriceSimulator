@@ -2,6 +2,19 @@
 #'
 #' \code{sstock} outputs price path for a fully random stock evolution
 #'
+#' @param initial_stock_price Stock price at initial step
+#' @param time_to_maturity Time upon which measurement is done
+#' @param seed Control Randmoness
+#' @param scale Divided part of a unit. For instance scale of 100 will divide
+#'  4 units of time in 100 parts each, that brings to a total time of
+#'  400 periods of time measurement.
+#' @param sigma Volatility of the stock
+#' @param alpha Mean rate of return of the stock
+#'
+##' @return A data.frame containing 2 variables: stock_price_path and the
+##'  according time_periods.
+##'
+#' @author Anthony Tedde
 #' @export
 sstock <- function(initial_stock_price = 50,
                    time_to_maturity = 4,
@@ -26,18 +39,18 @@ sstock <- function(initial_stock_price = 50,
               )
 }
 
-##' .. content for \description{} (no empty lines) ..
+##' Stock price path approximation using ito formula.
 ##'
 ##' .. content for \details{} ..
-##' @title
-##' @param initial_stock_price
-##' @param time_to_maturity
-##' @param seed
-##' @param scale
-##' @param sigma
-##' @param alpha
-##' @return
-##' @author
+##' @title Stock Price Approximation
+##'
+##' @inheritParams sstock
+##'
+##' @return A data.frame containing 2 variables: stock_price_path and the
+##'  according time_periods.
+##'
+##' @author Anthony Tedde
+##'
 ##' @export
 sstock_ito <- function(initial_stock_price = 50,
                        time_to_maturity = 4,
