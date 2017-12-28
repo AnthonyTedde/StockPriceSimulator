@@ -2,3 +2,4 @@
 
 export(sstock)
 export(sstock_ito)
+export(vasicek_ir)
