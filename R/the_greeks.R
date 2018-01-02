@@ -59,6 +59,32 @@ theta <- function(initial_stock_price = 50,
                   strike = initial_stock_price,
                   riskless_rate = 0.03){
 
+  # Create stock price path according to parameters:
+  S <- sstock(initial_stock_price = initial_stock_price,
+              time_to_maturity = time_to_maturity,
+              seed = seed,
+              scale = scale,
+              sigma = sigma,
+              alpha = alpha)
+
+  t <- S$time_periods
+  X <- S$stock_price_path
+
+  remaining_time = tail(t, 1) - t
+
+  d_plus <- StockPriceSimulator::d(stock_tick = S,
+                                   sigma = sigma,
+                                   strike = strike,
+                                   riskless_rate = riskless_rate)
+
+  d_min <- StockPriceSimulator::d(stock_tick = S,
+                                   sigma = sigma,
+                                   strike = strike,
+                                   riskless_rate = riskless_rate,
+                                  sign = '-')
+
+  -riskless_rate * strike * exp(-riskless_rate * remaining_time) * pnorm(d_min) -
+    (sigma * X) / (2 * sqrt(remaining_time)) * dnorm(d_plus)
 }
 
 #' The gamma in the Black-Scholes-Merton corresponds to the second derivative of
