@@ -22,6 +22,19 @@ delta <- function(initial_stock_price = 50,
                   strike = initial_stock_price,
                   riskless_rate = 0.03){
 
+  # Create stock price path according to parameters:
+  S <- sstock(initial_stock_price = initial_stock_price,
+              time_to_maturity = time_to_maturity,
+              seed = seed,
+              scale = scale,
+              sigma = sigma,
+              alpha = alpha)
+
+  d_plus <- StockPriceSimulator::d(stock_tick = S,
+                                   sigma = sigma,
+                                   strike = strike,
+                                   riskless_rate = riskless_rate)
+  pnorm(d_plus)
 }
 
 #' The theta in the Black-Scholes-Merton corresponds to the first derivative of
@@ -67,14 +80,44 @@ gamma <- function(initial_stock_price = 50,
                   sigma = 1,
                   alpha = 0,
                   strike = initial_stock_price,
-                  riskless_rate = 0.03){}
+                  riskless_rate = 0.03){
+
+}
 
 #
 # Internal Use
 #
+#' Title
+#'
+#' @param stock_tick
+#' @param sigma
+#' @param strike
+#' @param riskless_rate
+#' @param sign
+#'
+#' @return
+#' @export
+#'
+#' @examples
 d <- function(stock_tick,
               sigma,
               strike,
-              riskless_rate){
+              riskless_rate,
+              sign = '+'){
+
+  t <- stock_tick$time_periods
+  S <- stock_tick$stock_price_path
+  remaining_time <- tail(t, 1) - t
+
+  outer_multiplier <- 1/(sigma * sqrt(remaining_time))
+
+  # tmp variable used in eval_parse_paste function. Creation of that variable
+  # remove complexity of the operation
+  tmp <- sigma ^ 2 / 2
+  inner_multiplier <- eval(parse(text =
+                                   paste(riskless_rate,
+                                         sign,
+                                         tmp)))
+  outer_multiplier * (log(S/strike) + inner_multiplier * remaining_time)
 
 }

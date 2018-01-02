@@ -2,7 +2,7 @@
 % Please edit documentation in R/sstock.R
 \name{sstock}
 \alias{sstock}
-\title{Stock ticker simulation}
+\title{Sample stock ticker simulation}
 \usage{
 sstock(initial_stock_price = 50, time_to_maturity = 4, seed = 1,
   scale = 100, sigma = 1, alpha = 0)
@@ -12,7 +12,7 @@ sstock(initial_stock_price = 50, time_to_maturity = 4, seed = 1,
 
 \item{time_to_maturity}{Time upon which measurement is done}
 
-\item{seed}{Control Randmoness}
+\item{seed}{Control randmoness}
 
 \item{scale}{Divided part of a unit. For instance scale of 100 will divide
 4 units of time in 100 parts each, that brings to a total time of
@@ -27,7 +27,7 @@ A data.frame containing 2 variables: stock_price_path and the
  according time_periods.
 }
 \description{
-\code{sstock} outputs price path for a fully random stock evolution
+\code{sstock} outputs price path for a fully random sampled stock evolution
 }
 \author{
 Anthony Tedde
