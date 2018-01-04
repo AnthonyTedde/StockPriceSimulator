@@ -19,8 +19,8 @@ BSM <- function(delta_time,
   k <- strike
   r <- interest_rate
 
-  d_plus <- 1/(sigma * sqrt(delta_time)) * (log(x/k) + (r + sigma ^2 / 2) * delta_time)
-  d_min <- 1/(sigma * sqrt(delta_time)) * (log(x/k) + (r - sigma ^2 / 2) * delta_time)
+  d_plus <- 1/(sigma * sqrt(delta_time)) * (log10(x/k) + (r + sigma ^2 / 2) * delta_time)
+  d_min <- 1/(sigma * sqrt(delta_time)) * (log10(x/k) + (r - sigma ^2 / 2) * delta_time)
 
 
   x * pnorm(d_plus) - k * exp(-r * delta_time) * pnorm(d_min)
