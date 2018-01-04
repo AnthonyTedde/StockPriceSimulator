@@ -5,8 +5,8 @@
 #' Delta
 #'
 #' @inheritParams sstock
-#' @param strike
-#' @param riskless_rate
+#' @param strike Strike price defined for the stock option
+#' @param riskless_rate Riskless rate
 #'
 #' @return
 #'
@@ -41,6 +41,9 @@ delta <- function(initial_stock_price = 50,
 #' the BSM function with respect to time(t). It can be thought as the
 #' instantaneous change in BSM price when time move forward
 #'
+#' (!) due to the zero division as t -> T, the final value when t = T is not a
+#' number
+#'
 #' Theta
 #'
 #' @inheritParams delta
@@ -67,24 +70,29 @@ theta <- function(initial_stock_price = 50,
               sigma = sigma,
               alpha = alpha)
 
+  # Simplify notation
   t <- S$time_periods
   X <- S$stock_price_path
+  r <- riskless_rate
+  k <- strike
 
   remaining_time = tail(t, 1) - t
 
-  d_plus <- StockPriceSimulator::d(stock_tick = S,
-                                   sigma = sigma,
-                                   strike = strike,
-                                   riskless_rate = riskless_rate)
+  # Call to function d
+  args <- list(stock_tick = S,
+               sigma = sigma,
+               strike = strike,
+               riskless_rate = riskless_rate)
 
-  d_min <- StockPriceSimulator::d(stock_tick = S,
-                                   sigma = sigma,
-                                   strike = strike,
-                                   riskless_rate = riskless_rate,
-                                  sign = '-')
+  d_plus <- do.call(StockPriceSimulator::d, args)
 
-  -riskless_rate * strike * exp(-riskless_rate * remaining_time) * pnorm(d_min) -
+  d_min <- do.call(StockPriceSimulator::d, list(args, sign = '-'))
+
+  # Formula Subset to remove the NaN last value
+  (
+  -r * k * exp(-r * remaining_time) * pnorm(d_min) -
     (sigma * X) / (2 * sqrt(remaining_time)) * dnorm(d_plus)
+  )[-(time_to_maturity * scale + 1)]
 }
 
 #' The gamma in the Black-Scholes-Merton corresponds to the second derivative of
@@ -107,7 +115,26 @@ gamma <- function(initial_stock_price = 50,
                   alpha = 0,
                   strike = initial_stock_price,
                   riskless_rate = 0.03){
+# Simplify notation
+  t <- S$time_periods
+  X <- S$stock_price_path
+  r <- riskless_rate
+  k <- strike
 
+  remaining_time = tail(t, 1) - t
+
+  # Call to function d
+  args <- list(stock_tick = S,
+               sigma = sigma,
+               strike = strike,
+               riskless_rate = riskless_rate)
+
+  d_plus <- do.call(StockPriceSimulator::d, args)
+
+  # Formula Subset to remove the NaN last value
+  (
+  1/(sigma * X * sqrt(remaining_time)) * dnorm(d_plus)
+  )[-(time_to_maturity * scale + 1)]
 }
 
 #

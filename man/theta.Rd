@@ -25,11 +25,17 @@ theta(initial_stock_price = 50, time_to_maturity = 4, seed = 1,
 
 \item{alpha}{Mean rate of return of the stock}
 
-\item{riskless_rate}{}
+\item{strike}{Strike price defined for the stock option}
+
+\item{riskless_rate}{Riskless rate}
 }
 \value{
 
 }
 \description{
+(!) due to the zero division as t -> T, the final value when t = T is not a
+number
+}
+\details{
 Theta
 }
