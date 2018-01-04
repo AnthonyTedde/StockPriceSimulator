@@ -86,7 +86,7 @@ theta <- function(initial_stock_price = 50,
 
   d_plus <- do.call(StockPriceSimulator::d, args)
 
-  d_min <- do.call(StockPriceSimulator::d, list(args, sign = '-'))
+  d_min <- do.call(StockPriceSimulator::d, c(args, sign = '-'))
 
   # Formula Subset to remove the NaN last value
   (
