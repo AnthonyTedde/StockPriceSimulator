@@ -9,28 +9,36 @@ output:
     smart: false 
 ---
 # StockPriceSimulator
-
-
-
-
+ 
+ 
 ## Introduction
+
 This package provide a way to simulate a fully random stock ticker based on
 theory provided by __"Stochastic Calculus For Finance ii", Shreve"__
-
-
+ 
 
 ## Functions provided by the package
+
 ### Key functions
 
  * Stock price generator for a single instance: [sstock()](sstock)
  * Stock price generator for a single instance, using the Ito's formula approximation
  [sstock\_ito()](sstock\_ito)
+ * Position taken in hedging strategy: [delta()](delta)
+ * First derivative of option pricing function with respect to time: [theta()](theta)
+ * Second derivative of option pricing function with respect to stock price: [gamma()](gamma)
+ 
+ 
+### Optionals or peripherals functions
+
+ * Multiplier used several time: d
+ 
 
 ## Description of the functions as they was created and defined
+
 ### sstock()
 
-#### Summary
-
+#### Summary 
 It returns a data.frame containing the following variables:
 
  * time_periods
@@ -98,4 +106,36 @@ ggplot2::ggplot(stock_tick,
         ggplot2::geom_line(data = stock_tick_ito,
                            ggplot2::aes(time_periods, stock_price_path),
                            color = 'steelblue')
+```
+
+
+### delta()
+
+Delta return the position one should take in order to hedge a short position
+in a call.
+ 
+
+### theta()
+
+### gamma()
+
+
+## Test Black-Scholes-Merton function
+```{R}
+# Create a stoch price motion from 0 to 4(Year) with a daily step
+S <- sstock(initial_stock_price = 50,
+            time_to_maturity = 4,
+            scale = 360)
+# According to the previous sampled path, the option price is computed
+# With option in the money
+C <- BSM(stock_path = S)
+```
+```{R echo=FALSE}
+ggplot2::ggplot(S, ggplot2::aes(time_periods, stock_price_path)) +
+  ggplot2::geom_point()
+```
+
+```{R echo=FALSE}
+ggplot2::ggplot(C, ggplot2::aes(time_periods, option_price_path)) +
+  ggplot2::geom_point()
 ```
