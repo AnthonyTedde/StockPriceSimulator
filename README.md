@@ -3,9 +3,16 @@
     -   [Functions provided by the
         package](#functions-provided-by-the-package)
         -   [Key functions](#key-functions)
+        -   [Optionals or peripherals
+            functions](#optionals-or-peripherals-functions)
     -   [Description of the functions as they was created and
         defined](#description-of-the-functions-as-they-was-created-and-defined)
         -   [sstock()](#sstock)
+        -   [delta()](#delta)
+        -   [theta()](#theta)
+        -   [gamma()](#gamma)
+    -   [Test Black-Scholes-Merton
+        function](#test-black-scholes-merton-function)
 
 StockPriceSimulator
 ===================
@@ -25,6 +32,15 @@ Functions provided by the package
 -   Stock price generator for a single instance: [sstock()](sstock)
 -   Stock price generator for a single instance, using the Ito’s formula
     approximation [sstock\_ito()](sstock_ito)
+-   Position taken in hedging strategy: [delta()](delta)
+-   First derivative of option pricing function with respect to time:
+    [theta()](theta)
+-   Second derivative of option pricing function with respect to stock
+    price: [gamma()](gamma)
+
+### Optionals or peripherals functions
+
+-   Multiplier used several time: d
 
 Description of the functions as they was created and defined
 ------------------------------------------------------------
@@ -80,6 +96,14 @@ It returns a data.frame containing the following variables:
 #### Example of Usage
 
     library(StockPriceSimulator)
+
+    ## 
+    ## Attaching package: 'StockPriceSimulator'
+
+    ## The following object is masked from 'package:base':
+    ## 
+    ##     gamma
+
     stock_tick <- sstock()
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-2-1.png) \#\#\#
@@ -147,3 +171,27 @@ The computed path is based on approximation given by the Itô’s formula.
     stock_tick_ito <- sstock_ito(scale = 1000)
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+
+### delta()
+
+Delta return the position one should take in order to hedge a short
+position in a call.
+
+### theta()
+
+### gamma()
+
+Test Black-Scholes-Merton function
+----------------------------------
+
+    # Create a stoch price motion from 0 to 4(Year) with a daily step
+    S <- sstock(initial_stock_price = 50,
+                time_to_maturity = 4,
+                scale = 360)
+    # According to the previous sampled path, the option price is computed
+    # With option in the money
+    C <- BSM(stock_path = S)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
