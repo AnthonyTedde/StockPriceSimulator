@@ -46,7 +46,9 @@ sstock <- function(initial_stock_price = 50,
     #  * stock_price_path
     #
     structure(data.frame(t, S),
-              names = c("time_periods", "stock_price_path")
+              names = c("time_periods", "stock_price_path"),
+              class = c(class(data.frame()),
+                        'theoretical_stock_price')
               )
 }
 

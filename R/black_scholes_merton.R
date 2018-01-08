@@ -1,3 +1,6 @@
+#' This function compute the Black-Scholes-Merton call and put price for [time -
+#' stock price]
+#'
 #' Black-Scholes_Merton equation
 #'
 #' @param delta_time
@@ -25,3 +28,4 @@ BSM <- function(delta_time,
 
   x * pnorm(d_plus) - k * exp(-r * delta_time) * pnorm(d_min)
 }
+
