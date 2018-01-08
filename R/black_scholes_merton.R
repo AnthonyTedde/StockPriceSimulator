@@ -3,29 +3,44 @@
 #'
 #' Black-Scholes_Merton equation
 #'
+#'
+#' @param stock_path data.frame containing the stock price evolution along with
+#'   the appropriate time serie
 #' @param delta_time
 #' @param current_stock_price
-#' @param strike
-#' @param interest_rate
+#' @param k Strike price of the option. By default the option is in the money.
+#'   it means that the strike is equal to the initial price of stock (at time 1)
+#' @param r Riskless interest rate - 0.03 if no value provided.
 #' @param sigma
 #'
 #' @return
 #' @export
 #'
 #' @examples
-BSM <- function(delta_time,
-                current_stock_price,
-                strike,
-                interest_rate,
-                sigma){
-  x <- current_stock_price
-  k <- strike
-  r <- interest_rate
+#'
+BSM <- function(stock_path = sstock(),
+                k = stock_path$stock_price_path[1],
+                r = 0.03,
+                sigma = 1){
 
-  d_plus <- 1/(sigma * sqrt(delta_time)) * (log10(x/k) + (r + sigma ^2 / 2) * delta_time)
-  d_min <- 1/(sigma * sqrt(delta_time)) * (log10(x/k) + (r - sigma ^2 / 2) * delta_time)
+  # Create new and make easily usable and/or readable some variables
+  #
+  S <- stock_path$stock_price_path
+  t <- stock_path$time_periods
+  remaining_time <- tail(t, 1) - t
 
+  # Data transformation
+  #
+  # From theory, d1 make reference to d+ while d2 refers to d-
+  #
+  args <- list(stock_tick = stock_path, sigma = sigma, strike = k, riskless_rate = r)
+  d1 <- do.call(d, args)
+  d2 <- do.call(d, c(args, sign = '-'))
 
-  x * pnorm(d_plus) - k * exp(-r * delta_time) * pnorm(d_min)
+  # Output
+  #
+  # In this version the time evolved with the stock price as well.
+  # TODO: a fixed time BSM.
+  S * pnorm(d2) - k * exp(-r * remaining_time) * pnorm(d1)
 }
 

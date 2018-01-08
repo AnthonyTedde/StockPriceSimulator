@@ -2,13 +2,26 @@
 % Please edit documentation in R/black_scholes_merton.R
 \name{BSM}
 \alias{BSM}
-\title{Black-Scholes_Merton equation}
+\title{This function compute the Black-Scholes-Merton call and put price for [time -
+stock price]}
 \usage{
-BSM(delta_time, current_stock_price, strike, interest_rate, sigma)
+BSM(stock_path = sstock(), k = stock_path$stock_price_path[1], r = 0.03,
+  sigma = 1)
 }
 \arguments{
+\item{stock_path}{data.frame containing the stock price evolution along with
+the appropriate time serie}
+
+\item{k}{Strike price of the option. By default the option is in the money.
+it means that the strike is equal to the initial price of stock (at time 1)}
+
+\item{r}{Riskless interest rate - 0.03 if no value provided.}
+
 \item{sigma}{}
 }
 \description{
 Black-Scholes_Merton equation
+}
+\examples{
+
 }
