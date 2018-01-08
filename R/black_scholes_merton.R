@@ -41,7 +41,7 @@ BSM <- function(stock_path = sstock(),
   #
   # In this version the time evolved with the stock price as well.
   # TODO: a fixed time BSM.
-  C <- S * pnorm(d2) - k * exp(-r * remaining_time) * pnorm(d1)
+  C <- S * pnorm(d1) - k * exp(-r * remaining_time) * pnorm(d2)
   structure(data.frame(time_periods = t,
                        option_price_path = C))
 }
