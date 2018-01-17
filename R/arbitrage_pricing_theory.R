@@ -30,14 +30,27 @@ tstock_discrete <- function(s0 = 4, up = 2, dim = 4){
   })
 }
 
-# Option price
-v1 <- c(0, s1[2] - k)
+# Option price for a one period maturity option
+# Create a stock motion
+library(purrr)
+k <- 5
+r <- 0.25
+u <- 2
+d <- 1 / r
+s <- tstock_discrete(dim = 4)
+
 
 discount_r <- 1/(1+r)
 
-p1 <- (1 + r - d) / (u - d)
-q1 <- 1 - p1
+p_neutral <- (1 + r - d) / (u - d)
+q_neutral <- 1 - p1
 
-x0 <- discount_r * (p1 * v1[2] + q1 * v1[1])
+v_last <- purrr::map_dbl(s[, ncol(s)], ~ max(. - k, 0))
+outer(v_last, v_last, FUN = function(i, j){
+  i  * p_neutral + j * q_neutral
+})
+
+
+x0 <- discount_r * (p_neutral * v1[2] + q_neutral * v1[1])
 
 
