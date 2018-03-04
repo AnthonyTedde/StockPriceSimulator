@@ -121,3 +121,48 @@ sstock_ito <- function(initial_stock_price = 50,
                'stock_price_path' = c(S0,
                                       S0 + prime_x + 0.5 * sec_x + prime_t))
 }
+
+##'
+##' This function approximates the return of a stock price driven by a unique
+##' Brownian Motion, using the Itô-Doeblin formula for Itô-processes.
+##'
+##' @title Stock Price Approximation using Itô
+##'
+##' @inheritParams sstock
+##'
+##' @return A data.frame containing 2 variables: stock_price_path and the
+##'  according time_periods.
+##'
+##' @author Anthony Tedde
+##'
+##' @export
+sstock_return_ito <- function(initial_stock_price = 50,
+                       time_to_maturity = 4,
+                       seed = 1,
+                       scale = 100,
+                       sigma = 1,
+                       alpha = 0){
+
+    S0 <- initial_stock_price
+
+    # time_structure: Sequence of time from initial time (0) up to
+    # time_to_maturity sliced in equal part according to the parameter _scale_ :
+    #
+    time_structure <- seq(0,
+                          time_to_maturity,
+                          length.out = (time_to_maturity * scale) + 1)
+
+    ## Brownian Motion generation (according to parameter)
+    bw <- RandomWalk::sbmotion(time_to_maturity = time_to_maturity,
+                               seed = seed,
+                               scale = scale)
+
+    W <- bw$brownian_motion_path
+    t <- bw$time_periods
+
+    ## Comupte the differential of path and time of the brownian motion:
+    differential <- as.data.frame(diff(as.matrix(bw)))
+
+    # Return a stock price return according to Ito apporximation
+    alpha * differential$time_periods + sigma * differential$brownian_motion_path
+}
