@@ -1,0 +1,10 @@
+library(ggplot2)
+initial_stock_price = 50
+time_to_maturity = 5
+seed = 1
+scale = 365 # Daily measurement
+sigma = .2
+alpha = 0
+lambda =  .3
+lognormal_params = list(meanlog = 0, sd  = 1/10)
+

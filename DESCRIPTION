@@ -3,7 +3,7 @@ Title: Stock Price Simulator
 Version: 0.0.0.9000
 Authors@R: person("Anthony", "Tedde", email = "antho.tedde@gmail.com", role = c("aut", "cre"))
 Description: It provides a way to simulate the motion of a stock price evolution.
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.3.3)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
