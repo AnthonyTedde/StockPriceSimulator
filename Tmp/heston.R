@@ -6,14 +6,14 @@
 
 initial_stock_price = 50
 initial_volatility = 0.3
-time_to_maturity = 5
+time_to_maturity = 1
 seed = 1
 scale = 365 # Daily measuremen
 alpha = 0
-rho = 1
-kappa = 2
-theta = 0.1
-sigma = .1
+rho = -.7
+kappa = 0
+theta = 0
+sigma = .0
 
 
 ##############################################
@@ -30,7 +30,8 @@ W1 <- bms$'1'$brownian_motion_path
 W2 <- bms$'2'$brownian_motion_path
 
 dB1 <- diff(W1)
-dB2 <- diff(rho * W1 + sqrt( 1 - rho ^2) * W2)
+B2 <- rho * W1 + sqrt( 1 - rho ^2) * W2
+dB2 <- diff(B2)
 
 t <- seq(0, time_to_maturity,
          length.out = time_to_maturity * scale + 1)
@@ -68,7 +69,10 @@ s <- Reduce(
   }, d1, initial_stock_price, accumulate = T)
 
 structure(data.frame(time_periods = t,
-                     stock_price_path = s))
+                     stock_price_path = s,
+                     B1 = W1,
+                     B2 = B2,
+                     CIR = v))
 
 ################################### END OF FUNCTION ############################
 

@@ -196,7 +196,6 @@ sstock_jump <- function(initial_stock_price = 50,
     mu <- jumps_intensity_parameters$mean
     delta <- jumps_intensity_parameters$sd
     lognormal_mean <- exp(mu  + 1/2 * delta ^2)
-    lognormal_sd <- exp(2 * mu + delta ^2) * (exp(delta ^2) - 1)
     k <- lognormal_mean - 1
 
     ##
@@ -210,7 +209,8 @@ sstock_jump <- function(initial_stock_price = 50,
 
     ## Next step is to define the size of each jump depending on the according distribution
     ## y ~ iid normal(mu, delta)
-    jump_intensity <- do.call(what = rlnorm, args = c(n = tail(N, 1), jumps_intensity_parameters))
+    jump_intensity <- do.call(what = rlnorm, args = c(n = tail(N, 1),
+                                                      jumps_intensity_parameters))
     cumulative_jump_intensity <- purrr::map_dbl(N, ~ sum(log(jump_intensity[0:.x])))
 
     ##################################
@@ -218,7 +218,8 @@ sstock_jump <- function(initial_stock_price = 50,
     ##################################
 
     bm <- RandomWalk::sbmotion(time_to_maturity = time_to_maturity,
-                               scale = scale)
+                               scale = scale,
+                               seed = seed)
     W <- bm$brownian_motion_path
     t <- bm$time_periods
 
@@ -243,6 +244,10 @@ sstock_jump <- function(initial_stock_price = 50,
                grp = as.factor(N))
 
 }
+
+
+
+
 
 ##' @export
 heston <- function(initial_stock_price = 50,
@@ -269,7 +274,8 @@ heston <- function(initial_stock_price = 50,
   W2 <- bms$'2'$brownian_motion_path
 
   dB1 <- diff(W1)
-  dB2 <- diff(rho * W1 + sqrt( 1 - rho ^2) * W2)
+  B2 <- rho * W1 + sqrt( 1 - rho ^2) * W2
+  dB2 <- diff(B2)
 
   t <- seq(0, time_to_maturity,
            length.out = time_to_maturity * scale + 1)
@@ -281,7 +287,7 @@ heston <- function(initial_stock_price = 50,
   # CIR model
 
   # time frame
-  d2 <- apply(rbind(dt,dB2),2,as.pairlist)
+  d2 <- apply(rbind(dt,dB2), 2, as.pairlist)
 
 
   # random_volatility: vector that takes in the volatility to be applied
@@ -306,5 +312,8 @@ heston <- function(initial_stock_price = 50,
     }, d1, initial_stock_price, accumulate = T)
 
   structure(data.frame(time_periods = t,
-                       stock_price_path = s))
+                       stock_price_path = s,
+                       B1 = W1,
+                       B2 = B2,
+                       CIR = v))
 }
