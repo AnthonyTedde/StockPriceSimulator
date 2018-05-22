@@ -84,3 +84,66 @@ S <- data.frame(t = t, s = s)
 library(ggplot2)
 ggplot(S, aes(x = t, y = s)) +
     geom_line()
+
+
+
+#####################################
+## HESTON: Characteristic function ##
+#####################################
+
+initial_stock_price = 50
+initial_volatility = .2
+theta = .2
+kappa = 1
+sigma = .3
+alpha = .5
+rho = .8
+time_to_maturity = 2
+w = 1
+
+## 1
+a <- complex(real = -w ^2 / 2, imaginary = -w / 2)
+beta <- kappa - complex(imaginary = rho * sigma * w)
+gamma <- sigma ^2 / 2
+
+## 2
+h <- sqrt(beta ^2 - 4 * a * gamma)
+
+## 3
+rplus <- (beta + h) / sigma ^2
+rmin <- (beta - h) / sigma ^2
+
+## 4
+g <- rmin / rplus
+
+## 5
+d <- rmin * (1 - exp(-h * time_to_maturity)) / (1 - g * exp(-h * time_to_maturity))
+c <- kappa * (rmin * time_to_maturity - 2 / sigma ^2 * log((1 - g * exp(-h * time_to_maturity))/(1 - g))))
+
+## 6
+psi <- exp(c * theta + d * initial_volatility + complex(imaginary = w * log(initial_stock_price * exp(alpha * time_to_maturity))))
+
+## TEST THE FUNCTION
+heston_ch <- heston_characteristic(initial_stock_price = 50,
+                                   initial_volatility = .20,
+                                   theta = .20,
+                                   kappa = 1,
+                                   sigma = .1,
+                                   alpha = .30,
+                                   rho = -.4,
+                                   time_to_maturity = 1)
+
+function(w){
+    ## etcetera...
+}
+integral(function(wheston_ch, -Inf, Inf)
+
+########################
+## HESTON: Call price ##
+########################
+fun <- function(
+pi1 <- 1/2 + 1/pi 
+
+## Local Variables:
+## ess-r-package--project-cache: (StockPriceSimulator . "~/workspace/thesis/StockPriceSimulator/")
+## End:
