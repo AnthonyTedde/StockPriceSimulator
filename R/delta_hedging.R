@@ -11,20 +11,22 @@
 #' @param alpha Drift rate of the simulated stock time series
 #' @param r Riskless interest rate - 0.03 if no value provided.
 #' @param scale Year divided factor
+#' @param full By defaut the function only return the delta hedging results
 #'
 #' @return
 #'
-#' @export
-#'
 #' @examples
 #'
+#'
+#' @export
 delta_hedging <- function(time_to_maturity,
                           S,
                           strike,
                           sigma = 0.2,
                           alpha = 0.05,
                           r = 0.03,
-                          scale = 365){
+                          scale = 365,
+                          full = F){
 
   ## 2. Simulate 500 GRM that correspond to that date
   GBM <- map(1:500, ~sstock(initial_stock_price = S,
@@ -88,6 +90,8 @@ delta_hedging <- function(time_to_maturity,
                - .x$delta[time_to_maturity * scale + 1] * strike
                - o * (1 + r / (scale)) ^ (time_to_maturity * scale))
 
-  structure(list("delta" = i,
-                 "summury" = u))
+  if(full)
+    structure(list("delta" = i,
+                   "summury" = u))
+  else i
 }
