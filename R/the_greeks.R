@@ -171,6 +171,6 @@ d <- function(stock_tick,
                                    paste(riskless_rate,
                                          sign,
                                          tmp)))
-  outer_multiplier * (log10(S/strike) + inner_multiplier * remaining_time)
+  outer_multiplier * (log(S/strike) + inner_multiplier * remaining_time)
 
 }
