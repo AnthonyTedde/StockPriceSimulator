@@ -69,11 +69,6 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
                - .x$delta[time_to_maturity * scale + 1] * strike
                - o * (1 + r / (scale)) ^ (time_to_maturity * scale))
 
-  ratio <- purrr::map_dbl(u,
-                   ~ sum(.x$with.interest)
-                   / (.x$delta[time_to_maturity * scale + 1] * strike
-                   + o * (1 + r / (scale)) ^ (time_to_maturity * scale)))
-
   hedging_cost <- purrr::map_dbl(u,
                                  ~ sum(.x$with.interest) - .x$delta[time_to_maturity * scale + 1] * strike)
   hedging_cost_sd <- sd(hedging_cost)
@@ -81,6 +76,6 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
 
   if(full)
     structure(list("delta" = i,
-                   "ratio" = ratio,
+                   "perf" = hedging_perf,
                    "summury" = u))
   else hedging_perf
