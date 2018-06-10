@@ -1,32 +1,11 @@
-#' This function compute the delta hedging for time series following
-#' Geometric Brownian Motion. i.e. log-return are normally distributed.
-#'
-#' Delta hedging of Black-Scholes_Merton
-#'
-#'
-#' @param time_to_maturity Time up to maturity in year
-#' @param S Initial value of the Stock
-#' @param strike Strike price of the option.
-#' @param sigma Volatility rate of the simulated stock time series
-#' @param alpha Drift rate of the simulated stock time series
-#' @param r Riskless interest rate - 0.03 if no value provided.
-#' @param scale Year divided factor
-#' @param full By defaut the function only return the delta hedging results
-#'
-#' @return
-#'
-#' @examples
-#'
-#'
-#' @export
-delta_hedging <- function(time_to_maturity,
-                          S,
-                          strike,
-                          sigma = 0.2,
-                          alpha = 0.05,
-                          r = 0.03,
-                          scale = 365,
-                          full = F){
+time_to_maturity <- 399/365
+S <- 186.31
+strike <- 130
+sigma = 0.2
+alpha = 0.40
+r = 0.05
+scale = 365
+full <- T
 
   ## 2. Simulate 500 GRM that correspond to that date
 GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
@@ -105,4 +84,3 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
                    "ratio" = ratio,
                    "summury" = u))
   else hedging_perf
-}
