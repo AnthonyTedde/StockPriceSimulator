@@ -21,6 +21,12 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
            r = r,
            sigma = sigma)$option_price_path[1]
 
+  # Option price for all Geometric BM at all times
+  O <- purrr::map(GBM, ~BSM(.x,
+                            k = strike,
+                            r = r,
+                            sigma = sigma)$option_price_path)
+
   #  Computation of delta for each time series GBM
   d <- purrr::map(1:500, ~delta(initial_stock_price = S,
                          time_to_maturity = time_to_maturity,
@@ -38,7 +44,8 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
   # list of arrays used in functional pmap structure.
   l <- list(diff_delta,
             d,
-            GBM)
+            GBM,
+            O)
 
   # Output a dataframe containing:
   #   * The remaining time till maturity
@@ -48,13 +55,14 @@ GBM <- purrr::map(1:500, ~sstock(initial_stock_price = S,
   #   * The value of the stock for each time following a Geom. Brownian Motion
   #   * The Total amount paid to get delta stock at time t
   #   * The Total amout paid to get delta stock at time t, but value for T
-  u <- purrr::pmap(l, .f = function(dd, d, G){
+  u <- purrr::pmap(l, .f = function(dd, d, G, O){
 
     time_remaining <- (time_to_maturity * scale + 1) : 1
     amount_paid <- dd * G$stock_price_path
     amount_with_interest <- amount_paid * (1 + r / (scale)) ^ (time_remaining - 1)
 
     data.frame("time remaining" = time_remaining,
+               "option price" = O,
                "diff delta" = dd,
                "delta" = d,
                "S" = G$stock_price_path,
