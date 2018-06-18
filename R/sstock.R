@@ -249,6 +249,18 @@ sstock_jump <- function(initial_stock_price = 50,
 
 
 
+##' @param initial_stock_price
+##'
+##' @param initial_volatility
+##' @param time_to_maturity
+##' @param seed
+##' @param scale
+##' @param alpha
+##' @param rho
+##' @param kappa
+##' @param theta
+##' @param sigma
+##'
 ##' @export
 heston <- function(initial_stock_price = 50,
                    initial_volatility = 0.3,

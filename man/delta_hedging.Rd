@@ -6,7 +6,7 @@
 Geometric Brownian Motion. i.e. log-return are normally distributed.}
 \usage{
 delta_hedging(time_to_maturity, S, strike, sigma = 0.2, alpha = 0.05,
-  r = 0.03, scale = 365)
+  r = 0.03, scale = 365, full = F)
 }
 \arguments{
 \item{time_to_maturity}{Time up to maturity in year}
@@ -22,6 +22,8 @@ delta_hedging(time_to_maturity, S, strike, sigma = 0.2, alpha = 0.05,
 \item{r}{Riskless interest rate - 0.03 if no value provided.}
 
 \item{scale}{Year divided factor}
+
+\item{full}{By defaut the function only return the delta hedging results}
 }
 \value{
 
