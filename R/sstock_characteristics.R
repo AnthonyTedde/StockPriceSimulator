@@ -55,6 +55,7 @@ heston_characteristic <- function(initial_stock_price = 50,
         # exp(c * theta + d * initial_volatility + complex(imaginary = w * log(initial_stock_price * exp(alpha * time_to_maturity))))
 
         exp(c * theta + d * initial_volatility + 1i * w * log(initial_stock_price * exp(alpha * time_to_maturity)))
+
     }
 
 }
@@ -184,6 +185,7 @@ gamma_heston <- function(S = heston()$stock_price_path,
     f_d2pi1 <- function(w){
       a <- exp( -1i * w * log(K)) * hc(w -1i) * (1i * w - 1)
       Re(a / (hc(-1i) * s ^2))
+
     }
 
     f_d2pi2 <- function(w){
@@ -201,6 +203,44 @@ gamma_heston <- function(S = heston()$stock_price_path,
   # return[length(return)] <- max(0, round(return[length(return)]))
   return(return)
 }
+
+
+##' @export
+call_heston <- function(initial_stock_price = 50,
+                        initial_volatility,
+                        theta,
+                        kappa,
+                        sigma,
+                        alpha,
+                        rho,
+                        time_to_maturity,
+                        K){
+
+  hc <- heston_characteristic(initial_stock_price,
+                              initial_volatility,
+                              theta,
+                              kappa,
+                              sigma,
+                              alpha,
+                              rho,
+                              time_to_maturity)
+  p1 <- function(w){
+    a <- exp(-1i * w * log(K)) * hc(w -1i)
+    Re(a / (1i * w * hc(-1i)))
+  }
+
+  p2 <- function(w){
+    a <- exp(-1i * w * log(K)) * hc(w)
+    Re(a / (1i * w))
+  }
+
+  pi1 <- 1/2 + 1/pi * integrate(p1, 0, Inf)$value
+  pi2 <- 1/2 + 1/pi * integrate(p2, 0, Inf)$value
+
+  initial_stock_price * pi1 - exp(-alpha * time_to_maturity) * K * pi2
+}
+
+
 
 
 
