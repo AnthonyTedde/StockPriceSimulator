@@ -136,14 +136,82 @@ heston_ch <- heston_characteristic(initial_stock_price = 50,
 function(w){
     ## etcetera...
 }
-integral(function(wheston_ch, -Inf, Inf)
+integrate(heston_ch, 0, Inf)
 
 ########################
 ## HESTON: Call price ##
 ########################
 fun <- function(
-pi1 <- 1/2 + 1/pi 
+pi1 <- 1/2 + 1/pi
 
 ## Local Variables:
 ## ess-r-package--project-cache: (StockPriceSimulator . "~/workspace/thesis/StockPriceSimulator/")
 ## End:
+
+
+
+call_heston <- function(initial_stock_price = 50,
+                        initial_volatility,
+                        theta,
+                        kappa,
+                        sigma,
+                        alpha,
+                        rho,
+                        time_to_maturity,
+                        K)
+
+  initial_stock_price = 1
+initial_volatility = .16
+theta = 0.16
+kappa = 1
+sigma = 2
+alpha = 0
+rho = -.8
+time_to_maturity = 10
+K = 2
+
+call_heston(initial_stock_price = 1,
+            initial_volatility = .16,
+            theta = 0.16,
+            kappa = 1,
+            sigma = 2,
+            alpha = .0,
+            rho = -.8,
+            time_to_maturity = 10,
+            K = 2)
+
+
+###############################################################################
+# calibration
+###############################################################################
+load(file="option-quote.RData")
+
+# 1.1. All the strike price available for all the maturity
+avail_stikes <- map(AAPL_o, `$`, calls) %>%
+  map(`$`, Strike) %>%
+  unlist %>% unname %>% unique %>% sort
+
+# 1.2 Covered maturities
+maturity <- names(AAPL_o)
+
+# 1.3 Construct the price surface
+dfs_call <- map(AAPL_o, `$`, call) %>%
+  map(~.x[, 1:2]) %>%
+  Filter(f = Negate(is.null))
+
+price_surface <- dfs_call[[1]]
+for(i in names(dfs_call[-1])){
+  price_surface <- merge(price_surface, dfs_call[[i]], by = "Strike", all = T)
+}
+colnames(price_surface) <- c("Strike", names(dfs_call))
+# First subsetting of the price surface
+price_surface <- structure(price_surface[23:57, -4])
+rownames(price_surface) <- 1:nrow(price_surface)
+
+# 1.4 Convert the maturity date based on the price surface
+maturity <- names(price_surface)[-1] %>%
+  as.Date(format = "%b.%d.%Y") - as.Date("2018-05-18")
+
+
+
+
