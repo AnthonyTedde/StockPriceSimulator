@@ -98,7 +98,7 @@ call_heston <- function(initial_stock_price = 50,
 
 ##' @export
 delta_heston <- function(S = heston()$stock_price_path,
-                        initial_volatility,
+                        V = heston()$CIR,
                         theta,
                         kappa,
                         sigma,
@@ -109,17 +109,17 @@ delta_heston <- function(S = heston()$stock_price_path,
 
   remaining.time <- seq(time_to_maturity, 0, length.out = length(S))
   # To get the last price computed at the very last minute:
-  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24 * 60)))
+  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24)))
 
-  hc <- purrr::pmap(list(S, remaining.time),
+  hc <- purrr::pmap(list(S, V, remaining.time),
                     ~ heston_characteristic(..1,
-                                            initial_volatility,
+                                            ..2,
                                             theta,
                                             kappa,
                                             sigma,
                                             alpha,
                                             rho,
-                                            ..2))
+                                            ..3))
 
   return <- pmap_dbl(list(hc, S, remaining.time), .f = function(hc, s, t){
     p1 <- function(w){
@@ -142,7 +142,8 @@ delta_heston <- function(S = heston()$stock_price_path,
     fi1 <- 1 / pi * integrate(f1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
     fi2 <- 1 / pi * integrate(f2, 0, Inf, subdivisions=2000, stop.on.error = F)$value
 
-    pi1 + s * fi1 - exp(-alpha * t) * K * fi2
+   pi1 + s * fi1 - exp(-alpha * t) * K * fi2
+    # pi1 + s * fi1 - s * fi2
   })
 
   return[length(return)] <- max(0, round(return[length(return)]))
@@ -152,7 +153,7 @@ delta_heston <- function(S = heston()$stock_price_path,
 
 ##' @export
 gamma_heston <- function(S = heston()$stock_price_path,
-                         initial_volatility,
+                         V = heston()$CIR,
                          theta,
                          kappa,
                          sigma,
@@ -163,17 +164,17 @@ gamma_heston <- function(S = heston()$stock_price_path,
 
   remaining.time <- seq(time_to_maturity, 0, length.out = length(S))
   # To get the last price computed at the very last minute:
-  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24 * 60)))
+  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24)))
 
-  hc <- purrr::pmap(list(S, remaining.time),
+  hc <- purrr::pmap(list(S, V, remaining.time),
                     ~ heston_characteristic(..1,
-                                            initial_volatility,
+                                            ..2,
                                             theta,
                                             kappa,
                                             sigma,
                                             alpha,
                                             rho,
-                                            ..2))
+                                            ..3))
 
   return <- pmap_dbl(list(hc, S, remaining.time), .f = function(hc, s, t){
 
@@ -206,39 +207,65 @@ gamma_heston <- function(S = heston()$stock_price_path,
 
 
 ##' @export
-call_heston <- function(initial_stock_price = 50,
-                        initial_volatility,
-                        theta,
-                        kappa,
-                        sigma,
-                        alpha,
-                        rho,
-                        time_to_maturity,
+merton_characteristic <- function(initial_stock_price = 50,
+                                  time_to_maturity = 5,
+                                  seed = 1,
+                                  scale = 365, # Daily measurement
+                                  sigma = .2,
+                                  alpha = 0,
+                                  lambda =  7,
+                                  jumps_intensity_parameters = list(mean = 0,
+                                                                    sd = 0.2)){
+  m <- jumps_intensity_parameters$mean
+  d <- jumps_intensity_parameters$sd
+  s <- initial_stock_price
+  t <- time_to_maturity
+  k <- exp(m + d ^2  / 2) - 1
+  function(w){
+     a <- lambda * t * (exp( 1i * m * w - d ^ 2 * w ^ 2 / 2) - 1)
+     b <- 1i * w * (log(s) + (alpha - sigma ^2 / 2 - lambda * k)* t)
+     c <- sigma ^2 * w ^2 / 2 * t
+     exp(a + b - c)
+  }
+}
+
+##' @export
+call_merton <- function(initial_stock_price = 50,
+                        time_to_maturity = 5,
+                        seed = 1,
+                        scale = 365, # Daily measurement
+                        sigma = .2,
+                        alpha = 0,
+                        lambda =  7,
+                        jumps_intensity_parameters = list(mean = 0,
+                                                          sd = 0.2),
                         K){
 
-  hc <- heston_characteristic(initial_stock_price,
-                              initial_volatility,
-                              theta,
-                              kappa,
-                              sigma,
-                              alpha,
-                              rho,
-                              time_to_maturity)
+  mc <- merton_characteristic(initial_stock_price = initial_stock_price,
+                              time_to_maturity = time_to_maturity,
+                              seed = 1,
+                              scale = 365, # Daily measurement
+                              sigma = sigma,
+                              alpha = alpha,
+                              lambda =  lambda,
+                              jumps_intensity_parameters = jumps_intensity_parameters)
   p1 <- function(w){
-    a <- exp(-1i * w * log(K)) * hc(w -1i)
-    Re(a / (1i * w * hc(-1i)))
+    a <- exp(-1i * w * log(K)) * mc(w -1i)
+    Re(a / (1i * w * mc(-1i)))
   }
 
   p2 <- function(w){
-    a <- exp(-1i * w * log(K)) * hc(w)
+    a <- exp(-1i * w * log(K)) * mc(w)
     Re(a / (1i * w))
   }
 
-  pi1 <- 1/2 + 1/pi * integrate(p1, 0, Inf)$value
-  pi2 <- 1/2 + 1/pi * integrate(p2, 0, Inf)$value
+  pi1 <- 1/2 + 1/pi * integrate(p1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+  pi2 <- 1/2 + 1/pi * integrate(p2, 0, Inf, subdivisions=2000, stop.on.error = F)$value
 
   initial_stock_price * pi1 - exp(-alpha * time_to_maturity) * K * pi2
 }
+
+
 
 
 
