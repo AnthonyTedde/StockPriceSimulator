@@ -174,3 +174,23 @@ d <- function(stock_tick,
   outer_multiplier * (log(S/strike) + inner_multiplier * remaining_time)
 
 }
+
+
+
+#' @export
+#'
+#' @examples
+delta_bsm <- function(s = sstock(),
+                  sigma = 1,
+                  strike = initial_stock_price,
+                  riskless_rate = 0.03){
+
+  # Create stock price path according to parameters:
+  S <- s
+
+  d_plus <- StockPriceSimulator::d(stock_tick = S,
+                                   sigma = sigma,
+                                   strike = strike,
+                                   riskless_rate = riskless_rate)
+  pnorm(d_plus)
+}

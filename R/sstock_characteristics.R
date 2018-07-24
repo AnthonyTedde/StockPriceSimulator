@@ -266,7 +266,56 @@ call_merton <- function(initial_stock_price = 50,
 }
 
 
+##' @export
+delta_merton <- function(S = sstock_jump()$stock_price_path,
+                         time_to_maturity,
+                         K,
+                         sigma = .2,
+                         alpha = 0,
+                         lambda = 7,
+                         jumps_intensity_parameters  = list(mean = 0,
+                                                            sd = 0.2)){
 
+  remaining.time <- seq(time_to_maturity, 0, length.out = length(S))
+  # To get the last price computed at the very last minute:
+  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24)))
+
+  hc <- purrr::pmap(list(S, remaining.time),
+                    ~ merton_characteristic(..1,
+                                            ..2,
+                                            sigma = sigma,
+                                            alpha = alpha,
+                                            lambda = lambda,
+                                            jumps_intensity_parameters = jumps_intensity_parameters))
+
+  return <- pmap_dbl(list(hc, S, remaining.time), .f = function(hc, s, t){
+    p1 <- function(w){
+      a <- exp(-1i * w * log(K)) * hc(w -1i)
+      Re(a / (1i * w * hc(-1i)))
+    }
+
+
+    f1 <- function(w){
+      a <- exp(-1i * w * log(K)) * hc(w -1i)
+      Re(a / (hc(-1i) * s))
+    }
+
+    f2 <- function(w){
+      a <- exp(-1i * w * log(K)) * hc(w)
+      Re(a / s)
+    }
+
+    pi1 <- 1/2 + 1/pi * integrate(p1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+    fi1 <- 1 / pi * integrate(f1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+    fi2 <- 1 / pi * integrate(f2, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+
+    pi1 + s * fi1 - exp(-alpha * t) * K * fi2
+    # pi1 + s * fi1 - s * fi2
+  })
+
+  return[length(return)] <- max(0, round(return[length(return)]))
+  return(return)
+}
 
 
 
