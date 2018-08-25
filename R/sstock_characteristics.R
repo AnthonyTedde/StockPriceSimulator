@@ -60,8 +60,8 @@ heston_characteristic <- function(initial_stock_price = 50,
 
 }
 
-##' @export
-call_heston <- function(initial_stock_price = 50,
+##' @export call_heston hsv_call
+hsv_call <- call_heston <- function(initial_stock_price = 50,
                         initial_volatility,
                         theta,
                         kappa,
@@ -96,8 +96,8 @@ call_heston <- function(initial_stock_price = 50,
 }
 
 
-##' @export
-delta_heston <- function(S = heston()$stock_price_path,
+##' @export delta_heston hsv_delta
+hsv_delta <- delta_heston <- function(S = heston()$stock_price_path,
                         V = heston()$CIR,
                         theta,
                         kappa,
@@ -151,8 +151,8 @@ delta_heston <- function(S = heston()$stock_price_path,
 }
 
 
-##' @export
-gamma_heston <- function(S = heston()$stock_price_path,
+##' @export hsv_gamma gamma_heston
+hsv_gamma <- gamma_heston <- function(S = heston()$stock_price_path,
                          V = heston()$CIR,
                          theta,
                          kappa,
@@ -207,6 +207,18 @@ gamma_heston <- function(S = heston()$stock_price_path,
 
 
 ##' @export
+hsv_theta <- function(S = heston()$stock_price_path,
+                                      V = heston()$CIR,
+                                      theta,
+                                      kappa,
+                                      sigma,
+                                      alpha,
+                                      rho,
+                                      time_to_maturity,
+                                      K){}
+
+
+##' @export
 merton_characteristic <- function(initial_stock_price = 50,
                                   time_to_maturity = 5,
                                   seed = 1,
@@ -229,8 +241,8 @@ merton_characteristic <- function(initial_stock_price = 50,
   }
 }
 
-##' @export
-call_merton <- function(initial_stock_price = 50,
+##' @export mjd_call call_merton
+mjd_call <- call_merton <- function(initial_stock_price = 50,
                         time_to_maturity = 5,
                         seed = 1,
                         scale = 365, # Daily measurement
@@ -266,8 +278,8 @@ call_merton <- function(initial_stock_price = 50,
 }
 
 
-##' @export
-delta_merton <- function(S = sstock_jump()$stock_price_path,
+##' @export delta_merton mjd_delta
+mjd_delta <- delta_merton <- function(S = sstock_jump()$stock_price_path,
                          time_to_maturity,
                          K,
                          sigma = .2,
@@ -317,23 +329,65 @@ delta_merton <- function(S = sstock_jump()$stock_price_path,
   return(return)
 }
 
+##' @export
+mjd_gamma <- function(S = sstock_jump()$stock_price_path,
+                      time_to_maturity,
+                      K,
+                      sigma = .2,
+                      alpha = 0,
+                      lambda = 7,
+                      jumps_intensity_parameters  = list(mean = 0,
+                                                         sd = 0.2)){
+
+  remaining.time <- seq(time_to_maturity, 0, length.out = length(S))
+  # To get the last price computed at the very last minute:
+  remaining.time <- c(remaining.time[-length(remaining.time)], (1 / (365 * 24)))
+
+  hc <- purrr::pmap(list(S, remaining.time),
+              ~ merton_characteristic(..1,
+                                      ..2,
+                                      sigma = sigma,
+                                      alpha = alpha,
+                                      lambda = lambda,
+                                      jumps_intensity_parameters = jumps_intensity_parameters))
+
+  return <- purrr::pmap_dbl(list(hc, S, remaining.time), .f = function(hc, s, t){
+
+    f_d1pi1 <- function(w){
+      a <- exp(-1i * w * log(K)) * hc(w -1i)
+      Re(a / (hc(-1i) * s))
+    }
+
+    f_d2pi1 <- function(w){
+      a <- exp( -1i * w * log(K)) * hc(w -1i) * (1i * w - 1)
+      Re(a / (hc(-1i) * s ^2))
+
+    }
+
+    f_d2pi2 <- function(w){
+      a <- exp(-1i * w * log(K)) * hc(w) * (1i * w - 1)
+      Re(a / s ^2)
+    }
+
+    d1pi1 <- 1/pi * integrate(f_d1pi1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+    d2pi1 <- 1/pi * integrate(f_d2pi1, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+    d2pi2 <- 1/pi * integrate(f_d2pi2, 0, Inf, subdivisions=2000, stop.on.error = F)$value
+
+    2 * d1pi1 + s * d2pi1 - exp(-alpha * t) * K * d2pi2
+  })
+
+  return(return)
+}
+
+##' @export
+mjd_theta <- function(S = sstock_jump()$stock_price_path,
+                      time_to_maturity,
+                      K,
+                      sigma = .2,
+                      alpha = 0,
+                      lambda = 7,
+                      jumps_intensity_parameters  = list(mean = 0,
+                                                         sd = 0.2)){
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

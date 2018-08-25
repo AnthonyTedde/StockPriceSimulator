@@ -15,8 +15,8 @@
 ##'  according time_periods.
 ##'
 #' @author Anthony Tedde
-#' @export
-sstock <- function(initial_stock_price = 50,
+#' @export bsm_ts sstock
+bsm_ts <- sstock <- function(initial_stock_price = 50,
                    time_to_maturity = 4,
                    seed = 1,
                    scale = 100,
@@ -180,8 +180,8 @@ sstock_return_ito <- function(initial_stock_price = 50,
 ##'
 ##' @author Anthony Tedde
 ##'
-##' @export
-sstock_jump <- function(initial_stock_price = 50,
+##' @export mjd_ts sstock_jump
+mjd_ts <- sstock_jump <- function(initial_stock_price = 50,
                         time_to_maturity = 5,
                         seed = 1,
                         scale = 365, # Daily measurement
@@ -261,8 +261,8 @@ sstock_jump <- function(initial_stock_price = 50,
 ##' @param theta
 ##' @param sigma
 ##'
-##' @export
-heston <- function(initial_stock_price = 50,
+##' @export hsv_ts heston
+hsv_ts <- heston <- function(initial_stock_price = 50,
                    initial_volatility = 0.3,
                    time_to_maturity = 5,
                    seed = 1,

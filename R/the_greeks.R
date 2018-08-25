@@ -10,10 +10,10 @@
 #'
 #' @return
 #'
-#' @export
+#' @export bsm_delta delta
 #'
 #' @examples
-delta <- function(initial_stock_price = 50,
+bsm_delta <- delta <- function(initial_stock_price = 50,
                   time_to_maturity = 4,
                   seed = 1,
                   scale = 100,
@@ -50,25 +50,16 @@ delta <- function(initial_stock_price = 50,
 #'
 #' @return
 #'
-#' @export
+#' @export bsm_theta theta
 #'
 #' @examples
-theta <- function(initial_stock_price = 50,
-                  time_to_maturity = 4,
-                  seed = 1,
-                  scale = 100,
+bsm_theta <- theta <- function(s,
                   sigma = 1,
-                  alpha = 0,
                   strike = initial_stock_price,
                   riskless_rate = 0.03){
 
   # Create stock price path according to parameters:
-  S <- sstock(initial_stock_price = initial_stock_price,
-              time_to_maturity = time_to_maturity,
-              seed = seed,
-              scale = scale,
-              sigma = sigma,
-              alpha = alpha)
+  S <- s
 
   # Simplify notation
   t <- S$time_periods
@@ -92,7 +83,7 @@ theta <- function(initial_stock_price = 50,
   (
   -r * k * exp(-r * remaining_time) * pnorm(d_min) -
     (sigma * X) / (2 * sqrt(remaining_time)) * dnorm(d_plus)
-  )[-(time_to_maturity * scale + 1)]
+  )
 }
 
 #' The gamma in the Black-Scholes-Merton corresponds to the second derivative of
@@ -104,27 +95,23 @@ theta <- function(initial_stock_price = 50,
 #'
 #' @return
 #'
-#' @export
+#' @export bsm_gamma gamma
 #'
 #' @examples
-gamma <- function(initial_stock_price = 50,
-                  time_to_maturity = 4,
-                  seed = 1,
-                  scale = 100,
+bsm_gamma <- gamma <- function(s,
                   sigma = 1,
-                  alpha = 0,
                   strike = initial_stock_price,
                   riskless_rate = 0.03){
 # Simplify notation
-  t <- S$time_periods
-  X <- S$stock_price_path
+  t <- s$time_periods
+  X <- s$stock_price_path
   r <- riskless_rate
   k <- strike
 
   remaining_time = tail(t, 1) - t
 
   # Call to function d
-  args <- list(stock_tick = S,
+  args <- list(stock_tick = s,
                sigma = sigma,
                strike = strike,
                riskless_rate = riskless_rate)
@@ -134,7 +121,7 @@ gamma <- function(initial_stock_price = 50,
   # Formula Subset to remove the NaN last value
   (
   1/(sigma * X * sqrt(remaining_time)) * dnorm(d_plus)
-  )[-(time_to_maturity * scale + 1)]
+  )
 }
 
 #

@@ -7,21 +7,6 @@
 sstock_return_ito(initial_stock_price = 50, time_to_maturity = 4,
   seed = 1, scale = 100, sigma = 1, alpha = 0)
 }
-\arguments{
-\item{initial_stock_price}{Stock price at initial step}
-
-\item{time_to_maturity}{Time upon which measurement is done}
-
-\item{seed}{Control randmoness}
-
-\item{scale}{Divided part of a unit. For instance scale of 100 will divide
-4 units of time in 100 parts each, that brings to a total time of
-400 periods of time measurement.}
-
-\item{sigma}{Volatility of the stock}
-
-\item{alpha}{Mean rate of return of the stock}
-}
 \value{
 A data.frame containing 2 variables: stock_price_path and the
  according time_periods.

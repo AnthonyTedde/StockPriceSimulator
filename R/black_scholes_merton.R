@@ -14,7 +14,7 @@
 #' @param sigma
 #'
 #' @return
-#' @export
+#' @export bsm_call BSM
 #'
 #' @examples
 #'
@@ -45,4 +45,5 @@ BSM <- function(stock_path = sstock(),
   structure(data.frame(time_periods = t,
                        option_price_path = C))
 }
+bsm_call = BSM
 
